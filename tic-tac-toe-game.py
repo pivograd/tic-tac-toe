@@ -203,7 +203,47 @@ def get_the_best_move():
 
     if current_move == 7:
 
-        pass
+        cells_y = [cell for cell in cells_with_o if cell != (1, 1)]
+        if cells_y[0][0] == cells_y[1][0]:
+            for i in range(3):
+                if cells_y[0][1] != i and cells_y[1][1] != i:
+                    cell = (cells_y[0][0], i)
+                    if cell in empty_cells:
+                        return cell
+        elif cells_y[0][1] == cells_y[1][1]:
+            for i in range(3):
+                if cells_y[0][0] != i and cells_y[1][0] != i:
+                    cell = (i, cells_y[0][1])
+                    if cell in empty_cells:
+                        return cell
+        else:
+            for cell_ in cells_y:
+                if cell_[0] == 1:
+                    if cell_[1] == 0:
+                        cell = (1, 2)
+                        if cell in empty_cells:
+                            return cell
+                    else:
+                        cell = (1, 0)
+                        if cell in empty_cells:
+                            return cell
+                if cell_[1] == 1:
+                    if cell_[0] == 0:
+                        cell = (2, 1)
+                        if cell in empty_cells:
+                            return cell
+                    else:
+                        cell = (0, 1)
+                        if cell in empty_cells:
+                            return cell
+
+        for cell_ in [(0, 0), (2, 0), (0, 2), (2, 2)]:
+            if cell_ in empty_cells:
+                return cell_
+
+    if current_move == 9:
+        cell = empty_cells[0]
+        return cell
 
 def make_computer_move():
 
@@ -255,7 +295,10 @@ def game_is_over():
     elif playing_field[0][2] == playing_field[1][1] and playing_field[0][2] == playing_field[2][0]:
         return True
     else:
-        return False
+        if current_move > 9:
+            return True
+        else:
+            return False
 
 
 
