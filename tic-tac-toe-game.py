@@ -6,11 +6,11 @@ import pygame
 pygame.init()
 
 
-screen_size = 500
+screen_size = 800
 cell_size = screen_size // 3
 
 
-current_player = 'O'
+current_player = 'X'
 current_move = 1
 empty_cells = [(0, 0),(0, 1),(0, 2),(1, 0),(1, 1),(1, 2),(2, 0),(2, 1),(2, 2)]
 cells_with_x = []
@@ -20,7 +20,7 @@ playing_field = [['0,0', '0,1', '0,2'],
                  ['2,0', '2,1', '2,2']]
 
 
-screen = pygame.display.set_mode((screen_size, screen_size))
+screen = pygame.display.set_mode((screen_size, screen_size+100))
 screen.fill((255,255,255))
 pygame.display.set_caption('Крестики-Нолики')
 font = pygame.font.SysFont('Arial', screen_size//7)
@@ -29,6 +29,44 @@ pygame.draw.line(surface = screen, color=(0,0,0), start_pos=(0, cell_size), end_
 pygame.draw.line(surface = screen, color=(0,0,0), start_pos=(0, cell_size*2), end_pos=(screen_size, cell_size*2), width=3)
 pygame.draw.line(surface = screen, color=(0,0,0), start_pos=(cell_size, 0), end_pos=(cell_size, screen_size), width=3)
 pygame.draw.line(surface = screen, color=(0,0,0), start_pos=(cell_size*2, 0), end_pos=(cell_size*2, screen_size), width=3)
+
+button_color = (60, 60, 60)
+button_rect = pygame.Rect(0, screen_size, screen_size, 100)
+pygame.draw.rect(screen, button_color, button_rect)
+button_text = font.render("New Game", True, (0, 0, 0))
+button_text_rect = button_text.get_rect(center=button_rect.center)
+screen.blit(button_text, button_text_rect)
+
+
+def reset_game():
+    global current_player, current_move, empty_cells, cells_with_x, cells_with_o, playing_field
+    current_player = 'X'
+    current_move = 1
+    empty_cells = [(0, 0), (0, 1), (0, 2), (1, 0), (1, 1), (1, 2), (2, 0), (2, 1), (2, 2)]
+    cells_with_x = []
+    cells_with_o = []
+    playing_field = [['0,0', '0,1', '0,2'],
+                     ['1,0', '1,1', '1,2'],
+                     ['2,0', '2,1', '2,2']]
+
+    screen.fill((255,255,255))
+
+    pygame.draw.line(surface=screen, color=(0, 0, 0), start_pos=(0, cell_size), end_pos=(screen_size, cell_size),
+                     width=3)
+    pygame.draw.line(surface=screen, color=(0, 0, 0), start_pos=(0, cell_size * 2),
+                     end_pos=(screen_size, cell_size * 2), width=3)
+    pygame.draw.line(surface=screen, color=(0, 0, 0), start_pos=(cell_size, 0), end_pos=(cell_size, screen_size),
+                     width=3)
+    pygame.draw.line(surface=screen, color=(0, 0, 0), start_pos=(cell_size * 2, 0),
+                     end_pos=(cell_size * 2, screen_size), width=3)
+
+    button_color = (60, 60, 60)
+    button_rect = pygame.Rect(0, screen_size, screen_size, 100)
+    pygame.draw.rect(screen, button_color, button_rect)
+    button_text = font.render("New Game", True, (0, 0, 0))
+    button_text_rect = button_text.get_rect(center=button_rect.center)
+    screen.blit(button_text, button_text_rect)
+
 
 def display_message(message):
     text_surface = font.render(message, True, (0,0,0))
@@ -72,6 +110,7 @@ def get_the_best_move():
     if current_move == 1:
         cell = (1, 1)
         return cell
+
     if current_move == 2:
         if (1, 1) not in cells_with_x:
             cell = (1, 1)
@@ -79,6 +118,7 @@ def get_the_best_move():
         else:
             cell = random.choice([(0, 0),(2, 0),(0, 2),(2, 2)])
             return cell
+
     if current_move == 3:
         for cell_ in [(0, 0),(2, 0),(0, 2),(2, 2)]:
             if cell_ in cells_with_x:
@@ -94,6 +134,7 @@ def get_the_best_move():
                 return cell
         cell = random.choice([(0, 0), (2, 0), (0, 2), (2, 2)])
         return cell
+
     if current_move == 4:
         if (1, 1) in cells_with_o:
             if (0, 0) in cells_with_x and (2, 2) in cells_with_x:
@@ -136,6 +177,7 @@ def get_the_best_move():
                     else:
                         cell = random.choice([(0, 0), (2, 0), (0, 2), (2, 2)])
                         return cell
+
         else:
             if cells_with_x[0][0] == cells_with_x[1][0]:
                 for i in range(3):
@@ -167,6 +209,7 @@ def get_the_best_move():
                                 index_2 = 0
                             cell = (index_1, index_2)
                             return cell
+
     if current_move == 5:
         for cell_ in cells_with_o:
             if cell_ == (1, 1):
@@ -200,6 +243,49 @@ def get_the_best_move():
             for cell in intersection:
                 if abs(cell[0]-cell_x[0][0]) == 2 or abs(cell[1]-cell_x[0][1]) == 2:
                     return cell
+
+    if current_move == 6:
+
+        if cells_with_o[0][0] == cells_with_o[1][0]:
+            for i in range(3):
+                if cells_with_o[0][1] != i and cells_with_o[1][1] != i:
+                    cell = (cells_with_o[0][0], i)
+                    if cell in empty_cells:
+                        return cell
+        elif cells_with_o[0][1] == cells_with_o[1][1]:
+            for i in range(3):
+                if cells_with_o[0][0] != i and cells_with_o[1][0] != i:
+                    cell = (i, cells_with_o[0][1])
+                    if cell in empty_cells:
+                        return cell
+
+        for cell_ in cells_with_x:
+            for cell_1 in cells_with_x:
+                if cell_ == cell_1:
+                    pass
+                else:
+                    if cell_[0] == cell_1[0]:
+                        for i in range(3):
+                            if cell_[1] != i and cell_1[1] != i:
+                                cell = (cell_[0], i)
+                                if cell in empty_cells:
+                                    return cell
+
+                    elif cell_[1] == cell_1[1]:
+                        for i in range(3):
+                            if cell_[0] != i and cell_1[0] != i:
+                                cell = (i, cell_[1])
+                                if cell in empty_cells:
+                                    return cell
+
+        for cell_ in cells_with_o:
+            if cell_ in [(0, 0), (2, 0), (0, 2), (2, 2)]:
+                cells = [cel for cel in empty_cells if cel in [(0, 0), (2, 0), (0, 2), (2, 2)]]
+                cel_g = (abs(cell_[0]-2), abs(cell_[1]-2))
+                for cel in cells:
+                    if cel != cel_g:
+                        return cel
+
 
     if current_move == 7:
 
@@ -240,6 +326,55 @@ def get_the_best_move():
         for cell_ in [(0, 0), (2, 0), (0, 2), (2, 2)]:
             if cell_ in empty_cells:
                 return cell_
+
+    if current_move == 8:
+
+        for cell_ in cells_with_o:
+            for cell_1 in cells_with_o:
+                if cell_ == cell_1:
+                    pass
+                else:
+                    if cell_[0] == cell_1[0]:
+                        for i in range(3):
+                            if cell_[1] != i and cell_1[1] != i:
+                                cell = (cell_[0], i)
+                                if cell in empty_cells:
+                                    return cell
+
+                    elif cell_[1] == cell_1[1]:
+                        for i in range(3):
+                            if cell_[0] != i and cell_1[0] != i:
+                                cell = (i, cell_[1])
+                                if cell in empty_cells:
+                                    return cell
+
+        for cell_ in cells_with_x:
+            for cell_1 in cells_with_x:
+                if cell_ == cell_1:
+                    pass
+                else:
+                    if cell_[0] == cell_1[0]:
+                        for i in range(3):
+                            if cell_[1] != i and cell_1[1] != i:
+                                cell = (cell_[0], i)
+                                if cell in empty_cells:
+                                    return cell
+
+                    elif cell_[1] == cell_1[1]:
+                        for i in range(3):
+                            if cell_[0] != i and cell_1[0] != i:
+                                cell = (i, cell_[1])
+                                if cell in empty_cells:
+                                    return cell
+
+        for cell_ in cells_with_o:
+            if cell_ in [(0, 0), (2, 0), (0, 2), (2, 2)]:
+                cells = [cel for cel in empty_cells if cel in [(0, 0), (2, 0), (0, 2), (2, 2)]]
+                cel_g = (abs(cell_[0]-2), abs(cell_[1]-2))
+                for cel in cells:
+                    if cel != cel_g:
+                        return cel
+
 
     if current_move == 9:
         cell = empty_cells[0]
@@ -307,7 +442,7 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
-        if current_player == 'X':
+        if current_player == 'X': 
             if event.type == pygame.MOUSEBUTTONUP:
                 make_move(pygame.mouse.get_pos())
                 current_player = 'O'
@@ -318,4 +453,10 @@ while True:
             current_move += 1
         if game_is_over():
             display_message('Игра окончена!')
+        if event.type == pygame.MOUSEBUTTONUP:
+            pos = pygame.mouse.get_pos()
+            if pos[1] > screen_size:
+                reset_game()
         pygame.display.flip()
+
+
