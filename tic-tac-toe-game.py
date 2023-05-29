@@ -10,13 +10,14 @@ def set_game_settings():
     screen_size = 800
     cell_size = screen_size // 3
 
-    current_player = 'X'  # изменить на выбор первого хода, путём нажатия на кнопку
+    current_player = 'O'  # изменить на выбор первого хода, путём нажатия на кнопку
 
     current_move = 1
     empty_cells = [(0, 0), (0, 1), (0, 2), (1, 0), (1, 1), (1, 2), (2, 0), (2, 1), (2, 2)]
     cells_with_x = []
     cells_with_o = []
     corner_cells = [(0, 0), (2, 0), (0, 2), (2, 2)]
+
     playing_field = [['0,0', '0,1', '0,2'],
                      ['1,0', '1,1', '1,2'],
                      ['2,0', '2,1', '2,2']]
@@ -50,15 +51,8 @@ def create_game():
 
 
 def reset_game():
-    global current_player, current_move, empty_cells, cells_with_x, cells_with_o, playing_field
-    current_player = 'X'
-    current_move = 1
-    empty_cells = [(0, 0), (0, 1), (0, 2), (1, 0), (1, 1), (1, 2), (2, 0), (2, 1), (2, 2)]
-    cells_with_x = []
-    cells_with_o = []
-    playing_field = [['0,0', '0,1', '0,2'],
-                     ['1,0', '1,1', '1,2'],
-                     ['2,0', '2,1', '2,2']]
+
+    set_game_settings()
 
     screen.fill((255, 255, 255))
 
@@ -156,22 +150,26 @@ def get_the_best_move():
     if current_move == 4:
         if (1, 1) in cells_with_o:
             if (0, 0) in cells_with_x and (2, 2) in cells_with_x:
-                cell = random.choice(corner_cells)
-                return cell
+                cell = random.choice([(1, 0),(0, 1),(2, 1),(1, 2)])
+                if cell in empty_cells:
+                    return cell
             elif (0, 2) in cells_with_x and (2, 0) in cells_with_x:
-                cell = random.choice(corner_cells)
-                return cell
+                cell = random.choice([(1, 0),(0, 1),(2, 1),(1, 2)])
+                if cell in empty_cells:
+                    return cell
             else:
                 if cells_with_x[0][0] == cells_with_x[1][0] and cells_with_x[0][0] != 1:
                     for i in range(3):
                         if cells_with_x[0][1] != i and cells_with_x[1][1] != i:
                             cell = (cells_with_x[0][0], i)
-                            return cell
+                            if cell in empty_cells:
+                                return cell
                 elif cells_with_x[0][1] == cells_with_x[1][1] and cells_with_x[0][1] != 1:
                     for i in range(3):
                         if cells_with_x[0][0] != i and cells_with_x[1][0] != i:
                             cell = (i, cells_with_x[0][1])
-                            return cell
+                            if cell in empty_cells:
+                                return cell
                 else:
                     for cell_ in corner_cells:
                         if cell_ in cells_with_x:
@@ -184,30 +182,36 @@ def get_the_best_move():
                             else:
                                 index_2 = 0
                             cell = (index_1, index_2)
-                            return cell
+                            if cell in empty_cells:
+                                return cell
                     if abs(cells_with_x[0][0] - cells_with_x[1][0]) == 1 and abs(
                             cells_with_x[0][1] - cells_with_x[1][1]) == 1:
                         if cells_with_x[0][0] == cells_with_x[1][1] and cells_with_x[0][1] == cells_with_x[1][0]:
                             cell = random.choice([(2, 0), (0, 2)])
-                            return cell
+                            if cell in empty_cells:
+                                return cell
                         else:
                             cell = random.choice([(2, 2), (0, 0)])
-                            return cell
+                            if cell in empty_cells:
+                                return cell
                     else:
                         cell = random.choice(corner_cells)
-                        return cell
+                        if cell in empty_cells:
+                            return cell
 
         else:
             if cells_with_x[0][0] == cells_with_x[1][0]:
                 for i in range(3):
                     if cells_with_x[0][1] != i and cells_with_x[1][1] != i:
                         cell = (cells_with_x[0][0], i)
-                        return cell
+                        if cell in empty_cells:
+                            return cell
             elif cells_with_x[0][1] == cells_with_x[1][1]:
                 for i in range(3):
                     if cells_with_x[0][0] != i and cells_with_x[1][0] != i:
                         cell = (i, cells_with_x[0][1])
-                        return cell
+                        if cell in empty_cells:
+                            return cell
             else:
                 for cell_ in cells_with_x:
                     if cell_ == (1, 1):
@@ -216,7 +220,8 @@ def get_the_best_move():
                         if abs(cells_with_o[0][0] - cell_[0]) == 2 and abs(cells_with_o[0][1] - cell_[1]) == 2:
                             intersection = [cell_ for cell_ in corner_cells if cell_ in empty_cells]
                             cell = random.choice(intersection)
-                            return cell
+                            if cell in empty_cells:
+                                return cell
                         else:
                             if cell_[0] == 0:
                                 index_1 = 2
@@ -227,7 +232,8 @@ def get_the_best_move():
                             else:
                                 index_2 = 0
                             cell = (index_1, index_2)
-                            return cell
+                            if cell in empty_cells:
+                                return cell
 
     if current_move == 5:
         for cell_ in cells_with_o:
@@ -305,6 +311,7 @@ def get_the_best_move():
                     if cel != cel_g:
                         return cel
 
+        return random.choice(empty_cells)
     if current_move == 7:
 
         cells_y = [cell for cell in cells_with_o if cell != (1, 1)]
@@ -468,15 +475,18 @@ def main():
                 sys.exit()
 
             if event.type == pygame.MOUSEBUTTONUP:
-                if current_player == 'X':
-                    try:
-                        make_move(pygame.mouse.get_pos())
-                        if game_is_over():
-                            display_message(f'Победил {current_player}')
-                        current_player = 'O'
-                        current_move += 1
-                    except ValueError:
-                        pass
+                if game_is_over():
+                    pass
+                else:
+                    if current_player == 'X':
+                        try:
+                            make_move(pygame.mouse.get_pos())
+                            if game_is_over():
+                                display_message(f'Победил {current_player}')
+                            current_player = 'O'
+                            current_move += 1
+                        except ValueError:
+                            pass
 
             if current_player == 'O':
                 make_computer_move()
@@ -484,7 +494,7 @@ def main():
                     display_message(f'Победил {current_player}')
                 current_player = 'X'
                 current_move += 1
-            if current_move > 9:
+            if current_move > 9 and not game_is_over():
                 display_message('НИЧЬЯ!')
             if event.type == pygame.MOUSEBUTTONUP:
                 pos = pygame.mouse.get_pos()
